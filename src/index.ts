@@ -13,7 +13,11 @@ import {
 import z from "zod";
 
 import { auth } from "./lib/auth.js";
-import { workoutPlanRoutes } from "./routes/WorkoutPlan.js";
+import { aiRoutes } from "./routes/ai.js";
+import { homeRoutes } from "./routes/home.js";
+import { meRoutes } from "./routes/me.js";
+import { statsRoutes } from "./routes/stats.js";
+import { workoutPlanRoutes } from "./routes/workout-plan.js";
 
 const app = Fastify({
   logger: true,
@@ -25,13 +29,13 @@ app.setSerializerCompiler(serializerCompiler);
 await app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: "App/System Treinos API",
-      description: "API para o App/System de Treinos",
+      title: "Bootcamp Treinos API",
+      description: "API para o bootcamp de treinos do FSC",
       version: "1.0.0",
     },
     servers: [
       {
-        description: "localhost",
+        description: "Localhost",
         url: "http://localhost:3000",
       },
     ],
@@ -49,8 +53,8 @@ await app.register(fastifyApiReference, {
   configuration: {
     sources: [
       {
-        title: "App Treinos API",
-        slug: "app-treinos-api",
+        title: "Bootcamp Treinos API",
+        slug: "bootcamp-treinos-api",
         url: "/swagger.json",
       },
       {
@@ -62,9 +66,13 @@ await app.register(fastifyApiReference, {
   },
 });
 
-//RESTful
-//Routes
+// RESTful
+// Routes
+await app.register(homeRoutes, { prefix: "/home" });
+await app.register(meRoutes, { prefix: "/me" });
+await app.register(statsRoutes, { prefix: "/stats" });
 await app.register(workoutPlanRoutes, { prefix: "/workout-plans" });
+await app.register(aiRoutes, { prefix: "/ai" });
 
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
@@ -77,12 +85,11 @@ app.withTypeProvider<ZodTypeProvider>().route({
   },
 });
 
-//TESTE
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
   url: "/",
   schema: {
-    description: "Hello World",
+    description: "Hello world",
     tags: ["Hello World"],
     response: {
       200: z.object({
@@ -133,7 +140,7 @@ app.route({
 });
 
 try {
-  await app.listen({ port: Number(process.env.PORT) || 3000 });
+  await app.listen({ port: Number(process.env.PORT) || 8081 });
 } catch (err) {
   app.log.error(err);
   process.exit(1);
